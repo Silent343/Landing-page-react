@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, Variants, AnimatePresence } from 'framer-motion';
 import { PricingCard } from '@/components/ui/pricing';
 import { Button } from '@/components/ui/button';
+import { SplineScene } from '@/components/ui/splite';
+import { Spotlight } from '@/components/ui/spotlight';
 import {
   Check, ChevronRight, ArrowRight, Zap, BarChart3, Bell,
   Wrench, Layers, Cpu, Play, X, Send, Menu,
@@ -693,10 +695,10 @@ export default function DyeTexLanding() {
         {/* Textile canvas background */}
         <TextileHeroCanvas />
 
-        {/* Radial ambient glow */}
-        <div className="absolute inset-0 pointer-events-none"
+        {/* Radial ambient glows */}
+        <div className="absolute inset-0 pointer-events-none z-[1]"
              style={{ background: 'radial-gradient(ellipse 70% 60% at 80% 50%, rgba(51,102,153,0.18) 0%, transparent 70%)' }} />
-        <div className="absolute inset-0 pointer-events-none"
+        <div className="absolute inset-0 pointer-events-none z-[1]"
              style={{ background: 'radial-gradient(ellipse 40% 50% at 15% 40%, rgba(0,229,160,0.07) 0%, transparent 60%)' }} />
 
         <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-10 pt-28 pb-24 grid md:grid-cols-2 gap-12 items-center">
@@ -765,87 +767,46 @@ export default function DyeTexLanding() {
             </motion.div>
           </motion.div>
 
-          {/* Right — 3D Textile Visualizer */}
+          {/* Right — Spline 3D + floating metrics */}
           <motion.div initial={{opacity:0,x:40}} animate={{opacity:1,x:0}} transition={{duration:0.8,delay:0.3}}
                       className="relative hidden md:flex items-center justify-center">
-            {/* Main loom frame */}
-            <div className="relative w-full max-w-[480px] aspect-square">
+            <div className="relative w-full max-w-[520px] h-[520px]">
 
-              {/* Outer ring */}
-              <div className="absolute inset-0 rounded-full border border-[#00E5A0]/10"
-                   style={{ animation: 'spoolSpin 30s linear infinite' }}/>
-              <div className="absolute inset-4 rounded-full border border-[#336699]/15"
-                   style={{ animation: 'spoolSpin 20s linear infinite reverse' }}/>
+              {/* Spotlight beam behind the 3D model */}
+              <Spotlight className="-top-20 left-10 md:left-20 md:-top-10" fill="#00E5A0" />
 
-              {/* Loom grid SVG */}
-              <svg className="absolute inset-8" viewBox="0 0 400 400">
-                {/* Warp (vertical) threads */}
-                {Array.from({length: 12}, (_,i) => {
-                  const x = 20 + i * 32;
-                  return (
-                    <line key={`v${i}`} x1={x} y1="10" x2={x} y2="390"
-                          stroke={i % 3 === 0 ? '#00E5A0' : '#336699'}
-                          strokeWidth={i % 3 === 0 ? 1.5 : 0.8}
-                          strokeOpacity={i % 3 === 0 ? 0.5 : 0.2}
-                          strokeDasharray={i % 2 === 0 ? '8 6' : '12 4'}/>
-                  );
-                })}
-                {/* Weft (horizontal) threads */}
-                {Array.from({length: 12}, (_,i) => {
-                  const y = 20 + i * 32;
-                  return (
-                    <line key={`h${i}`} x1="10" y1={y} x2="390" y2={y}
-                          stroke={i % 3 === 0 ? '#00E5A0' : '#336699'}
-                          strokeWidth={i % 3 === 0 ? 1.5 : 0.8}
-                          strokeOpacity={i % 3 === 0 ? 0.45 : 0.18}/>
-                  );
-                })}
-                {/* Intersection dots — woven pattern */}
-                {Array.from({length: 6}, (_,row) =>
-                  Array.from({length: 6}, (_,col) => {
-                    const x = 52 + col * 64, y = 52 + row * 64;
-                    const accent = (row + col) % 2 === 0;
-                    return (
-                      <circle key={`d${row}${col}`} cx={x} cy={y} r={accent ? 4 : 2.5}
-                              fill={accent ? '#00E5A0' : '#336699'}
-                              fillOpacity={accent ? 0.7 : 0.35}/>
-                    );
-                  })
-                )}
-                {/* Animated shuttle path */}
-                <path d="M10,200 Q100,140 200,200 Q300,260 390,200"
-                      stroke="#00E5A0" strokeWidth="2" fill="none" strokeLinecap="round"
-                      strokeDasharray="600" strokeDashoffset="600"
-                      style={{ animation: 'drawThread 2s ease-out forwards 1s' }}/>
-              </svg>
-
-              {/* Central spool */}
-              <div className="absolute inset-[35%] rounded-full bg-gradient-to-br from-[#00E5A0]/20 to-[#336699]/20
-                              border border-[#00E5A0]/40 flex items-center justify-center
-                              shadow-[0_0_40px_rgba(0,229,160,0.2)]"
-                   style={{ animation: 'glowPulse 3s ease-in-out infinite' }}>
-                <svg viewBox="0 0 60 60" className="w-10 h-10">
-                  <circle cx="30" cy="30" r="25" stroke="#00E5A0" strokeWidth="2" fill="none" strokeOpacity="0.6"/>
-                  <circle cx="30" cy="30" r="14" stroke="#336699" strokeWidth="1.5" fill="none" strokeOpacity="0.5"/>
-                  <circle cx="30" cy="30" r="5" fill="#00E5A0" fillOpacity="0.8"/>
-                  <line x1="30" y1="5" x2="30" y2="55" stroke="#00E5A0" strokeWidth="1" strokeOpacity="0.3"/>
-                  <line x1="5" y1="30" x2="55" y2="30" stroke="#00E5A0" strokeWidth="1" strokeOpacity="0.3"/>
-                </svg>
+              {/* Spline 3D scene */}
+              <div className="absolute inset-0 rounded-2xl overflow-hidden">
+                <SplineScene
+                  scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+                  className="w-full h-full"
+                />
               </div>
+
+              {/* Subtle border glow frame */}
+              <div className="absolute inset-0 rounded-2xl border border-[#00E5A0]/15 pointer-events-none
+                              shadow-[inset_0_0_60px_rgba(0,229,160,0.04)]" />
 
               {/* Floating metric badges */}
               {[
-                { text: 'RPM 1,240', sub: 'Machine A', x: '-14%', y: '10%', delay: '0s' },
-                { text: '98.2°C',    sub: 'Temp OK',   x: '88%',  y: '20%', delay: '0.4s' },
-                { text: '0 Faults',  sub: 'Live Status',x: '-10%', y: '76%', delay: '0.8s' },
+                { text: 'RPM 1,240', sub: 'Machine A',   pos: 'top-4 -left-4',    delay: '0s'   },
+                { text: '98.2°C',    sub: 'Temp OK',     pos: 'top-16 -right-6',  delay: '0.5s' },
+                { text: '0 Faults',  sub: 'Live Status', pos: 'bottom-8 -left-6', delay: '1s'   },
               ].map((b, i) => (
-                <div key={i} className="absolute bg-[#111118]/90 border border-white/[0.09] backdrop-blur-sm
-                                        rounded-xl px-3 py-2 shadow-lg"
-                     style={{ left: b.x, top: b.y, animation: `floatBadge ${2.5 + i * 0.5}s ease-in-out ${b.delay} infinite` }}>
+                <div key={i}
+                     className={`absolute ${b.pos} bg-[#111118]/95 border border-white/[0.10] backdrop-blur-md
+                                 rounded-xl px-3 py-2 shadow-xl pointer-events-none`}
+                     style={{ animation: `floatBadge ${2.5 + i * 0.6}s ease-in-out ${b.delay} infinite` }}>
                   <p className="font-[var(--font-display)] font-bold text-[#00E5A0] text-sm leading-none">{b.text}</p>
                   <p className="text-[10px] text-[rgba(232,244,241,0.45)] mt-0.5">{b.sub}</p>
                 </div>
               ))}
+
+              {/* Decorative outer rings */}
+              <div className="absolute -inset-4 rounded-full border border-[#00E5A0]/08 pointer-events-none"
+                   style={{ animation: 'spoolSpin 30s linear infinite' }}/>
+              <div className="absolute -inset-8 rounded-full border border-[#336699]/06 pointer-events-none"
+                   style={{ animation: 'spoolSpin 45s linear infinite reverse' }}/>
             </div>
           </motion.div>
         </div>
@@ -881,17 +842,54 @@ export default function DyeTexLanding() {
       </AnimatePresence>
 
       {/* ══ SOLUTIONS ═══════════════════════════════════ */}
-      <section id="solutions" className="py-28 bg-[#111118]">
-        <div className="max-w-7xl mx-auto px-6 md:px-10">
-          <div className="text-center mb-16">
-            <p className="dt-eyebrow reveal">{t.sol_eyebrow}</p>
-            <h2 className="reveal font-[var(--font-display)] font-extrabold tracking-tight mb-5"
-                style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}>
-              {t.sol_title.split('\n').map((l,i) => <span key={i}>{l}{i===0 && <br/>}</span>)}
-            </h2>
-            <p className="reveal text-[rgba(232,244,241,0.5)] text-[17px] max-w-xl mx-auto leading-relaxed">{t.sol_desc}</p>
-          </div>
+      <section id="solutions" className="relative bg-[#0A0A0F] overflow-hidden">
 
+        {/* ── Video banner header ─────────────────────── */}
+        <div className="relative h-[480px] md:h-[560px] flex items-center justify-center overflow-hidden">
+          {/* Video */}
+          <video
+            autoPlay loop muted playsInline
+            className="absolute inset-0 w-full h-full object-cover scale-105"
+            style={{ filter: 'brightness(0.35) saturate(0.8)' }}
+          >
+            <source src="/Img/mchn.mp4" type="video/mp4" />
+          </video>
+
+          {/* Gradient overlays */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0F]/60 via-transparent to-[#0A0A0F]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0A0A0F]/40 via-transparent to-[#0A0A0F]/40" />
+
+          {/* Subtle accent tint */}
+          <div className="absolute inset-0 pointer-events-none"
+               style={{ background: 'radial-gradient(ellipse 60% 70% at 50% 60%, rgba(0,229,160,0.07) 0%, transparent 70%)' }} />
+
+          {/* Header text — centered over video */}
+          <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
+            <p className="dt-eyebrow reveal">{t.sol_eyebrow}</p>
+            <h2 className="reveal font-[var(--font-display)] font-extrabold tracking-tight mb-6"
+                style={{ fontSize: 'clamp(2.4rem, 5vw, 3.8rem)' }}>
+              {t.sol_title.split('\n').map((l,i) => (
+                <span key={i} className={i === 1 ? 'dt-gradient-text' : ''}>{l}{i===0 && <br/>}</span>
+              ))}
+            </h2>
+            <p className="reveal text-[rgba(232,244,241,0.65)] text-[17px] max-w-xl mx-auto leading-relaxed">
+              {t.sol_desc}
+            </p>
+
+            {/* Live indicator badge */}
+            <div className="reveal inline-flex items-center gap-2 mt-8 bg-black/40 backdrop-blur-md
+                            border border-[#00E5A0]/25 px-4 py-2 rounded-full">
+              <span className="w-2 h-2 rounded-full bg-[#00E5A0]"
+                    style={{ animation: 'dotPulse 2s ease-in-out infinite' }}/>
+              <span className="text-[#00E5A0] text-[11px] font-bold tracking-[0.14em] uppercase">
+                Live plant monitoring
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Feature cards ────────────────────────────── */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 pb-28 -mt-2">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {featureKeys.map((k, i) => (
               <FeatureCard key={k} icon={featureIcons[i]} title={t[`${k}t`]} desc={t[`${k}d`]} delay={i} />

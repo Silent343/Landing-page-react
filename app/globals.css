@@ -154,6 +154,10 @@
   100% { opacity: 1; transform: translate(-50%, -40%) skewX(-10deg); }
 }
 
+.animate-spotlight {
+  animation: spotlight 2s ease forwards 0.3s;
+}
+
 /* ═══════════════════════════════════════════════════════
    UTILITY CLASSES
 ═══════════════════════════════════════════════════════ */
